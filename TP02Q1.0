@@ -17,51 +17,103 @@ class Filme{
       
    }
    
-   //remover Tags
-   public String removerTags (String original) {
-	   String resp = "";
-	   for(int i=0; i<original.length(); i++) {
-		   if(original.charAt(i)=='<') {
-			   while(original.charAt(i)!='>')i++;{
-				   
-			   }   
-		   }
-	   }
-	   return resp;
-   }
+    String removeTags(String line){
+        String newline = "";
+        int i=0;
+        while(i<line.length()){
+            if(line.charAt(i) == '<'){
+                i++; 
+                while(line.charAt(i) != '>') 
+                i++;             
+            } else {
+                if(line.charAt(i) == '&'){
+                    i+=5;
+                } else{
+                    newline += line.charAt(i);
+                }  
+                
+            }
+            i++;
+        }
+
+        return newline;
+    }
    
-   //ler
-   public void ler(String nomeFilme)  throws Exception {
-	   String caminho = "/temp/filmes/";
-	   FileReader fr = new FileReader(caminho + nomeFilme);
-	   BufferedReader br = new BufferedReader (fr);
-	   
-	   String linha = br.readLine();
-	   while(linha.contains("Titulo Original")) {
-	   linha = br.readLine();   
-	   }
-	  
-	   
-   }
+   
+   
+    public int myParseInt(String str){
+        String newline = "";
+        int i=0;
+        int num = 0;
+
+        //System.out.println(str);
+        while (i<str.length() && str.charAt(i) != ' ') {
+
+                newline += str.charAt(i);
+                i++;
+
+        }
+        //System.out.print(newline);
+        num = Integer.parseInt(newline);
+        return num;
+    }
+    
+    
    
    //clonagem
-   public Filme clone() {
-	   Filme clonagem = new Filme();
-	   
-	   setNome(nome);
-	   setTituloOriginal(tituloOriginal);
-	   setDataDeLancamento(dataDeLancamento);
-	   setDuracao(duracao);
-	   setGenero(genero);
-	   setIdiomaOriginal(idiomaOriginal);
-	   setSituacao(situacao);
-	   setOrcamento(orcamento);
-	   setPalavrasChave(palavrasChave);
-	   
-	   return clonagem;
-   }
+    public Serie clone(){
+        Serie resp = new Serie();
+        resp.nome = this.nome;
 
-   
+        return resp;
+    }
+    
+    //Imprimir
+     public void imprimir(){
+        MyIO.println("" + nome + " " + formato + " " + duracao + " " + pais + " " + idioma +  " " + emissora + " " + transmissao + " " + temporadas + " " + episodios);
+    }
+    
+    
+    
+    
+    
+    //Ler
+    public void ler(String nomeArquivo) throws Exception{
+        InputStreamReader isr = new InputStreamReader(new FileInputStream(nomeArquivo));
+
+        BufferedReader br = new BufferedReader(isr);
+
+        while(!br.readLine().contains("infobox_v2"));
+        br.readLine();
+        this.nome = removeTags(br.readLine());
+
+        while(!br.readLine().contains("Titulo Original"));
+        this.tituloOriginal = removeTags(br.readLine());
+
+        while(!br.readLine().contains("Data De Lançamento"));
+        this.dataDeLancamento = removeTags(br.readLine());
+
+        while(!br.readLine().contains("Duração"));
+        this.duracao = removeTags(br.readLine());
+
+        while(!br.readLine().contains("Gênero"));
+        this.genero = removeTags(br.readLine());
+
+        while(!br.readLine().contains("Idioma Original"));
+        this.idiomaOriginal = removeTags(br.readLine());
+
+        while(!br.readLine().contains("Situação"));
+        this.situacao = removeTags(br.readLine());
+
+        while(!br.readLine().contains("Orçamento"));
+        //System.out.print("" + removeTags(br.readLine()));
+        this.orcamento = myParseInt(removeTags(br.readLine()));
+
+        br.close();
+    }    
+    
+    
+
    //get set NOME
    public String getNome(){
       return nome;
@@ -127,4 +179,38 @@ class Filme{
    }
  
 
+}
+
+
+
+public class TP02Q1 {
+
+    public static boolean isFim(String str){
+        return(str.length() == 3 && str.charAt(0) == 'F' && str.charAt(1) == 'I' && str.charAt(2) == 'M');
+     }
+
+     /*public static boolean pesquisa(Serie[] array){
+         
+        return true;
+     }*/
+    
+    public static void main(String[] args){
+        MyIO.setCharset("UTF-8");
+        Serie serie = new Serie();
+        Serie[] array = new Serie[100];
+        String str = "";
+        //pesquisa(array);
+
+        str = MyIO.readLine();
+        try{
+            while(isFim(str) != true){
+            serie.ler("/temp/series/" + str);//mudar dps "temp" para "tmp" q é onde esta o arquivo no verde
+            serie.imprimir();
+            str = MyIO.readLine();
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }
